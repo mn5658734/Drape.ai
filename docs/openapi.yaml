@@ -1,0 +1,182 @@
+openapi: 3.0.3
+info:
+  title: Drape.ai API
+  description: AI-powered digital wardrobe API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development
+
+paths:
+  /auth/send-otp:
+    post:
+      summary: Send OTP to phone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone: { type: string }
+      responses:
+        '200':
+          description: OTP sent
+  /auth/verify-otp:
+    post:
+      summary: Verify OTP and get token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, otp]
+              properties:
+                phone: { type: string }
+                otp: { type: string }
+      responses:
+        '200':
+          description: Token and user
+  /users/{id}:
+    get:
+      summary: Get user profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: User object
+    put:
+      summary: Update user profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                gender: { type: string }
+                ageRange: { type: string }
+                preferredStyle: { type: array, items: { type: string } }
+                skinTone: { type: string }
+      responses:
+        '200':
+          description: Updated user
+  /wardrobe/{userId}:
+    get:
+      summary: Get wardrobe items
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: List of items
+    post:
+      summary: Add wardrobe item
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [imageUrl]
+              properties:
+                imageUrl: { type: string }
+                category: { type: string }
+                tags: { type: array, items: { type: string } }
+      responses:
+        '201':
+          description: Created item
+  /outfits/{userId}/suggestions:
+    get:
+      summary: Get outfit suggestions
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: occasion
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer }
+      responses:
+        '200':
+          description: List of outfits
+  /outfits/{userId}/rush-mode:
+    post:
+      summary: Rush mode - instant outfit
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Best outfit
+  /occasions:
+    get:
+      summary: List occasions
+      responses:
+        '200':
+          description: List of occasions
+  /donate/partners:
+    get:
+      summary: Get NGO partners
+      parameters:
+        - name: city
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: List of partners
+  /donate/schedule:
+    post:
+      summary: Schedule donation pickup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, itemIds, partnerId]
+              properties:
+                userId: { type: string }
+                itemIds: { type: array, items: { type: string } }
+                partnerId: { type: string }
+      responses:
+        '201':
+          description: Donation scheduled
+  /weather:
+    get:
+      summary: Get weather
+      parameters:
+        - name: city
+          in: query
+          schema: { type: string }
+        - name: lat
+          in: query
+          schema: { type: number }
+        - name: lon
+          in: query
+          schema: { type: number }
+      responses:
+        '200':
+          description: Weather data
