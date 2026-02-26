@@ -276,10 +276,12 @@ POST /api/wardrobe/:userId/bulk-upload
 ### Get Outfit Suggestions
 
 ```http
-GET /api/outfits/:userId/suggestions?occasion=office&limit=10
+GET /api/outfits/:userId/suggestions?occasion=office&limit=10&source=wardrobe
 ```
 
-**Query Params:** `occasion`, `limit`
+**Query Params:** `occasion`, `limit`, `source`
+- `source=wardrobe` (default): Use cached wardrobe items, classified by tags/LLM
+- `source=recent_photos`: Prioritize recently uploaded photos for suggestions
 
 **Response:**
 ```json

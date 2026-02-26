@@ -4,24 +4,51 @@ import { useApp } from '../context/AppContext';
 import { get, post } from '../api';
 
 export default function OutfitSwipePage() {
-  const { selectedOccasion } = useApp();
+  const { user, selectedOccasion } = useApp();
   const navigate = useNavigate();
   const [outfits, setOutfits] = useState([]);
   const [current, setCurrent] = useState(0);
+  const [wardrobeEmpty, setWardrobeEmpty] = useState(false);
+
+  const userId = user?.id || 'user-1';
 
   useEffect(() => {
-    get(`/outfits/user-1/suggestions?occasion=${selectedOccasion || 'office'}`)
+    get(`/wardrobe/${userId}`).then(d => {
+      const items = d.items || [];
+      setWardrobeEmpty(items.length === 0);
+    }).catch(() => setWardrobeEmpty(true));
+  }, [userId]);
+
+  useEffect(() => {
+    if (wardrobeEmpty) return;
+    get(`/outfits/${userId}/suggestions?occasion=${selectedOccasion || 'office'}&source=wardrobe`)
       .then(d => setOutfits(d.outfits || []))
       .catch(() => setOutfits([{ id: '1', aiExplanation: 'Blue shirt + navy pants. Professional look.', itemIds: [] }]));
-  }, [selectedOccasion]);
+  }, [selectedOccasion, userId, wardrobeEmpty]);
 
   const outfit = outfits[current];
 
   const handleAction = (action) => {
-    if (outfit) post(`/outfits/user-1/${outfit.id}/action`, { action }).catch(() => {});
+    if (outfit) post(`/outfits/${userId}/${outfit.id}/action`, { action }).catch(() => {});
     setCurrent(prev => prev + 1);
     if (current >= outfits.length - 1) navigate('/');
   };
+
+  if (wardrobeEmpty) {
+    return (
+      <div className="container">
+        <div style={{ marginBottom: 16 }}>
+          <Link to="/" style={{ color: '#8892b0', fontSize: 14 }}>← Back to Dashboard</Link>
+        </div>
+        <div className="card" style={{ textAlign: 'center', padding: 48 }}>
+          <p style={{ fontSize: 64, marginBottom: 16 }}>👗</p>
+          <h2 style={{ marginBottom: 8 }}>Your wardrobe is empty</h2>
+          <p style={{ color: '#8892b0', marginBottom: 24 }}>Add clothes first to get AI outfit suggestions from your wardrobe.</p>
+          <Link to="/wardrobe" className="btn">Add clothes</Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!outfit) return <div className="container"><p>Loading...</p></div>;
 

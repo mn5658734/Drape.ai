@@ -15,10 +15,17 @@ const OCCASIONS = [
 export default function DashboardPage() {
   const { user, selectedOccasion, setSelectedOccasion } = useApp();
   const [weather, setWeather] = useState(null);
+  const [wardrobeCount, setWardrobeCount] = useState(null);
+
+  const userId = user?.id || 'user-1';
 
   useEffect(() => {
     get('/weather?city=Mumbai').then(setWeather).catch(() => setWeather({ temperature: 24, condition: 'Sunny' }));
   }, []);
+
+  useEffect(() => {
+    get(`/wardrobe/${userId}`).then(d => setWardrobeCount((d.items || []).length)).catch(() => setWardrobeCount(0));
+  }, [userId]);
 
   const greeting = () => {
     const h = new Date().getHours();
@@ -57,13 +64,28 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <Link to="/outfit-swipe" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 32 }}>
-        <p style={{ fontSize: 48, marginBottom: 8 }}>👔</p>
-        <h3>Get outfit suggestions</h3>
-        <p style={{ color: '#8892b0', marginTop: 4 }}>Swipe to like or skip</p>
-      </Link>
+      <div style={{ display: 'grid', gap: 12, marginBottom: 24 }}>
+        <Link
+          to={wardrobeCount > 0 ? '/outfit-swipe' : '/wardrobe'}
+          className="card"
+          style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24 }}
+        >
+          <p style={{ fontSize: 40, marginBottom: 8 }}>👗</p>
+          <h3>Choose from wardrobe</h3>
+          <p style={{ color: '#8892b0', marginTop: 4, fontSize: 14 }}>
+            {wardrobeCount > 0
+              ? `AI suggests from your ${wardrobeCount} items (tags & occasion)`
+              : 'Add clothes first – your wardrobe is empty'}
+          </p>
+        </Link>
+        <Link to="/wardrobe" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24 }}>
+          <p style={{ fontSize: 40, marginBottom: 8 }}>➕</p>
+          <h3>Add clothes</h3>
+          <p style={{ color: '#8892b0', marginTop: 4, fontSize: 14 }}>Upload photos – AI classifies by tag/LLM</p>
+        </Link>
+      </div>
 
-      <div className="nav" style={{ marginTop: 24 }}>
+      <div className="nav" style={{ marginTop: 0 }}>
         <Link to="/wardrobe">➕ Add Clothes</Link>
         <Link to="/donate">♻️ Declutter</Link>
         <Link to="/profile">👤 Profile</Link>

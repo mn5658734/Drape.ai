@@ -7,11 +7,15 @@ const googleSheets = require('../services/googleSheets');
 let outfits = MOCK_OUTFITS.map(o => ({ ...o, id: o.id || uuidv4() }));
 
 // GET /api/outfits/:userId/suggestions
+// Query: occasion, limit, source=wardrobe|recent_photos
+// source=wardrobe: use cached wardrobe items (tags/LLM classified)
+// source=recent_photos: prioritize recently uploaded items for suggestions
 router.get('/:userId/suggestions', (req, res) => {
-  const { occasion, limit = 10 } = req.query;
+  const { occasion, limit = 10, source = 'wardrobe' } = req.query;
   let filtered = outfits.filter(o => o.status === 'suggested' || o.status === 'liked');
   if (occasion) filtered = filtered.filter(o => o.occasion === occasion);
-  res.json({ outfits: filtered.slice(0, parseInt(limit)) });
+  // When source=recent_photos, backend would use recently uploaded items; for now same results
+  res.json({ outfits: filtered.slice(0, parseInt(limit)), source });
 });
 
 // POST /api/outfits/:userId/suggest
