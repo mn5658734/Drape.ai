@@ -12,7 +12,11 @@ export default function WardrobePage() {
   const userId = user?.id || 'user-1';
 
   useEffect(() => {
-    get(`/wardrobe/${userId}`).then(d => setItems(d.items || [])).catch(() => setItems([]));
+    get(`/wardrobe/${userId}`).then(d => setItems(d.items || [])).catch(() => setItems([
+      { id: '1', category: 'shirt', tags: ['office_wear'], imageUrl: 'https://picsum.photos/seed/shirt1/200/250' },
+      { id: '2', category: 'pants', tags: ['casual'], imageUrl: 'https://picsum.photos/seed/pants1/200/250' },
+      { id: '3', category: 't-shirt', tags: ['summer'], imageUrl: 'https://picsum.photos/seed/tshirt1/200/250' },
+    ]));
   }, [userId]);
 
   const handleFile = async (e) => {

@@ -1,7 +1,14 @@
+import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 
 export default function ProfilePage() {
-  const { user } = useApp();
+  const { user, setUser } = useApp();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setUser(null);
+    navigate('/login');
+  };
 
   return (
     <div className="container">
@@ -18,6 +25,10 @@ export default function ProfilePage() {
       <div className="card" style={{ cursor: 'pointer' }}>Style Preference</div>
       <div className="card" style={{ cursor: 'pointer' }}>Favourite Outfits</div>
       <div className="card" style={{ opacity: 0.7 }}>Payments — Coming Soon</div>
+
+      <button className="btn btn-secondary" onClick={handleLogout} style={{ marginTop: 24 }}>
+        Log out
+      </button>
     </div>
   );
 }

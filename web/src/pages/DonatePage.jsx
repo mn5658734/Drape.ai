@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { get, post } from '../api';
 
 export default function DonatePage() {
@@ -7,7 +8,10 @@ export default function DonatePage() {
   const [scheduled, setScheduled] = useState(false);
 
   useEffect(() => {
-    get('/donate/partners').then(d => setPartners(d.partners || [])).catch(() => setPartners([{ id: 'ngo-1', name: 'Goonj', city: 'Mumbai' }]));
+    get('/donate/partners').then(d => setPartners(d.partners || [])).catch(() => setPartners([
+      { id: 'ngo-1', name: 'Goonj', city: 'Mumbai' },
+      { id: 'ngo-2', name: 'Uday Foundation', city: 'Delhi' },
+    ]));
   }, []);
 
   const handleSchedule = () => {
@@ -28,6 +32,9 @@ export default function DonatePage() {
 
   return (
     <div className="container">
+      <div style={{ marginBottom: 16 }}>
+        <Link to="/" style={{ color: '#8892b0', fontSize: 14 }}>← Back to Dashboard</Link>
+      </div>
       <h1 className="title">Declutter & Donate</h1>
       <p className="subtitle">Select items from your wardrobe to donate. We'll schedule a pickup.</p>
 

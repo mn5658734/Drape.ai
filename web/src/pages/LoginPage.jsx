@@ -16,10 +16,19 @@ export default function LoginPage() {
     navigate('/profile-setup');
   };
 
+  const handleTryDemo = () => {
+    setUser({ id: 'user-1', phone: '+919876543210', name: 'Demo User', isProfileComplete: true });
+    navigate('/');
+  };
+
   return (
     <div className="container">
       <h1 className="title">Welcome to Drape.ai</h1>
       <p className="subtitle">Sign in with your phone number</p>
+
+      <button className="btn btn-secondary" onClick={handleTryDemo} style={{ marginBottom: 24 }}>
+        Try demo (explore prototype)
+      </button>
 
       {step === 'phone' ? (
         <>
