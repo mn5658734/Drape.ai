@@ -60,13 +60,14 @@ export const post = (url, body) => api('POST', url, body);
 export const put = (url, body) => api('PUT', url, body);
 export const del = (url) => api('DELETE', url);
 
-export async function uploadPhoto(userId, file, category = 't-shirt') {
+export async function uploadPhoto(userId, file, category = 't-shirt', tags = []) {
   try {
     const fd = new FormData();
     fd.append('photo', file);
     fd.append('category', category);
+    if (tags?.length) fd.append('tags', Array.isArray(tags) ? tags.join(',') : tags);
     return await api('POST', `/wardrobe/${userId}/upload`, fd);
   } catch (_) {
-    return { id: 'mock-' + Date.now(), userId, category, imageUrl: 'https://picsum.photos/seed/new/200/250', tags: [] };
+    return { id: 'mock-' + Date.now(), userId, category, imageUrl: 'https://picsum.photos/seed/new/200/250', tags: tags || [] };
   }
 }

@@ -8,7 +8,11 @@ export default function WardrobePage() {
   const [items, setItems] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [category, setCategory] = useState('t-shirt');
+  const [customCategory, setCustomCategory] = useState('');
   const fileRef = useRef(null);
+
+  const effectiveCategory = category === 'other' ? (customCategory.trim() || 'other') : category;
+  const userTags = category === 'other' && customCategory.trim() ? [customCategory.trim()] : [];
 
   const userId = user?.id || 'user-1';
 
@@ -21,7 +25,7 @@ export default function WardrobePage() {
     if (!file || !file.type.startsWith('image/')) return;
     setUploading(true);
     try {
-      const item = await uploadPhoto(userId, file, category);
+      const item = await uploadPhoto(userId, file, effectiveCategory, userTags);
       setItems(prev => [item, ...prev]);
     } catch (err) {
       alert(err.message || 'Upload failed');
@@ -37,7 +41,7 @@ export default function WardrobePage() {
     if (file?.type.startsWith('image/')) {
       setUploading(true);
       try {
-        const item = await uploadPhoto(userId, file, category);
+        const item = await uploadPhoto(userId, file, effectiveCategory, userTags);
         setItems(prev => [item, ...prev]);
       } catch (err) {
         alert(err.message || 'Upload failed');
@@ -83,8 +87,13 @@ export default function WardrobePage() {
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <label style={{ marginRight: 8, color: '#8892b0' }}>Category:</label>
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="input" style={{ display: 'inline-block', width: 'auto', marginBottom: 0 }}>
+        <label style={{ display: 'block', marginBottom: 8, color: '#8892b0' }}>Category:</label>
+        <select
+          value={category}
+          onChange={(e) => { setCategory(e.target.value); if (e.target.value !== 'other') setCustomCategory(''); }}
+          className="input"
+          style={{ width: '100%', marginBottom: 0, minHeight: 48 }}
+        >
           <option value="t-shirt">T-shirt</option>
           <option value="shirt">Shirt</option>
           <option value="pants">Pants</option>
@@ -93,8 +102,21 @@ export default function WardrobePage() {
           <option value="jacket">Jacket</option>
           <option value="shoes">Shoes</option>
           <option value="dress">Dress</option>
+          <option value="other">Other (custom)</option>
         </select>
       </div>
+      {category === 'other' && (
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', marginBottom: 8, color: '#8892b0' }}>Name your category (used for your preference tags):</label>
+          <input
+            type="text"
+            placeholder="e.g. Jumpsuit, Cardigan, Sneakers"
+            value={customCategory}
+            onChange={(e) => setCustomCategory(e.target.value)}
+            className="input"
+          />
+        </div>
+      )}
 
       <div className="grid">
         {items.map(item => (
