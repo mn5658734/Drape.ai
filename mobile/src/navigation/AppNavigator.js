@@ -13,6 +13,7 @@ import WardrobeScreen from '../screens/WardrobeScreen';
 import DonateScreen from '../screens/DonateScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import RushModeScreen from '../screens/RushModeScreen';
+import ShoppingRecommendationsScreen from '../screens/ShoppingRecommendationsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -66,6 +67,7 @@ export default function AppNavigator() {
       <Stack.Screen name="Main" component={TabNavigator} />
       <Stack.Screen name="OutfitSwipe" component={OutfitSwipeScreen} />
       <Stack.Screen name="RushMode" component={RushModeScreen} />
+      <Stack.Screen name="ShoppingRecommendations" component={ShoppingRecommendationsScreen} />
     </Stack.Navigator>
   );
 }

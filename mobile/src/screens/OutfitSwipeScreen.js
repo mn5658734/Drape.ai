@@ -50,6 +50,9 @@ export default function OutfitSwipeScreen({ navigation }) {
         <Pressable style={styles.menuBtn} onPress={() => setMenuVisible(true)}>
           <Text style={styles.menuBtnText}>⋮</Text>
         </Pressable>
+        <Pressable style={styles.shopBtn} onPress={() => navigation.navigate('ShoppingRecommendations', { outfitId: outfit.id, occasion: selectedOccasion })}>
+          <Text style={styles.shopBtnText}>🛍 Shop similar</Text>
+        </Pressable>
         <Image source={{ uri: 'https://picsum.photos/seed/outfit/400/500' }} style={styles.img} />
         <View style={styles.overlay}>
           <Text style={styles.explanation}>{outfit.aiExplanation}</Text>
@@ -172,6 +175,8 @@ const styles = StyleSheet.create({
   card: { backgroundColor: '#1a1a2e', borderRadius: 20, overflow: 'hidden', marginBottom: 24, position: 'relative' },
   menuBtn: { position: 'absolute', top: 12, right: 12, zIndex: 10, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   menuBtnText: { color: '#fff', fontSize: 20, fontWeight: '700' },
+  shopBtn: { position: 'absolute', top: 12, left: 12, zIndex: 10, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' },
+  shopBtnText: { color: '#fff', fontSize: 14 },
   img: { width: '100%', height: 400, backgroundColor: '#16213e' },
   overlay: { padding: 16 },
   explanation: { color: '#8892b0', fontSize: 14 },

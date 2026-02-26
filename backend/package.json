@@ -8,7 +8,12 @@
     "dev": "nodemon src/server.js",
     "test": "jest"
   },
-  "keywords": ["drape", "wardrobe", "fashion", "ai"],
+  "keywords": [
+    "drape",
+    "wardrobe",
+    "fashion",
+    "ai"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
@@ -17,6 +22,7 @@
     "express": "^4.18.2",
     "googleapis": "^128.0.0",
     "mongoose": "^8.0.3",
+    "multer": "^1.4.5-lts.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

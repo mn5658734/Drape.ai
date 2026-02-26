@@ -16,5 +16,6 @@ router.use('/outfits', outfitRoutes);
 router.use('/occasions', occasionRoutes);
 router.use('/donate', donateRoutes);
 router.use('/weather', weatherRoutes);
+router.use('/shopping', shoppingRoutes);
 
 module.exports = router;

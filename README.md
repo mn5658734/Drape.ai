@@ -11,6 +11,7 @@ AI-powered digital wardrobe that helps users decide what to wear instantly durin
 ```
 drape-ai/
 ├── backend/          # Node.js + Express API
+├── web/              # React web app (photo upload)
 ├── mobile/           # React Native (Expo) app
 ├── docs/             # API docs, DB schema, UI flow
 │   ├── API_DOCUMENTATION.md
@@ -32,6 +33,16 @@ npm run dev
 ```
 
 API runs at `http://localhost:3000`
+
+### Web
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Runs at http://localhost:5173. **Photo upload** – click or drag & drop images to add clothes.
 
 ### Mobile (Expo)
 

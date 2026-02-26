@@ -13,7 +13,8 @@
 4. [Outfits](#4-outfits)
 5. [Occasions](#5-occasions)
 6. [Donate](#6-donate)
-7. [Weather](#7-weather)
+7. [Shopping Recommendations](#7-shopping-recommendations)
+8. [Weather](#8-weather)
 
 ---
 
@@ -190,6 +191,23 @@ GET /api/wardrobe/:userId
   ]
 }
 ```
+
+---
+
+### Upload Photo (multipart)
+
+```http
+POST /api/wardrobe/:userId/upload
+Content-Type: multipart/form-data
+```
+
+**Form fields:**
+- `photo` (file, required) – Image file (JPG, PNG, etc., max 10MB)
+- `category` (string, optional) – e.g. t-shirt, shirt, pants
+- `tags` (string, optional) – Comma-separated tags
+- `color` (string, optional)
+
+**Response:** Same as Add Wardrobe Item. Photo is uploaded to Google Drive when configured.
 
 ---
 
@@ -449,7 +467,40 @@ POST /api/donate/:donationId/confirm-pickup
 
 ---
 
-## 7. Weather
+## 7. Shopping Recommendations
+
+### Get Product Recommendations
+
+```http
+GET /api/shopping/recommendations?outfitId=&occasion=
+```
+
+**Query Params:** `outfitId`, `occasion`
+
+**Response:**
+```json
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Blue Formal Shirt",
+      "brand": "Peter England",
+      "price": "₹999",
+      "originalPrice": "₹1,499",
+      "platform": "Myntra",
+      "url": "https://www.myntra.com",
+      "image": "https://...",
+      "rating": 4.5
+    }
+  ],
+  "occasion": "office",
+  "message": "Similar products from our partners"
+}
+```
+
+---
+
+## 8. Weather
 
 ### Get Weather
 
