@@ -63,15 +63,22 @@ export default function WardrobePage() {
 
       <div
         className="upload-zone"
-        onClick={() => fileRef.current?.click()}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
         <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} />
         <p style={{ fontSize: 48, marginBottom: 8 }}>📷</p>
-        <p style={{ color: '#8892b0', marginBottom: 8 }}>Click or drag & drop to upload photos</p>
-        <p style={{ fontSize: 12, color: '#8892b0' }}>JPG, PNG up to 10MB</p>
+        <p style={{ color: '#8892b0', marginBottom: 12 }}>Upload photos from your device storage</p>
+        <p style={{ fontSize: 12, color: '#8892b0', marginBottom: 16 }}>Choose from gallery, photos, or files • JPG, PNG up to 10MB</p>
+        <button
+          type="button"
+          className="btn"
+          onClick={() => fileRef.current?.click()}
+          style={{ maxWidth: 280 }}
+        >
+          Choose photos from device
+        </button>
         {uploading && <p style={{ marginTop: 12, color: '#e94560' }}>Uploading...</p>}
       </div>
 
