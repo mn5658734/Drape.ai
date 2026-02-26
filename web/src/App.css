@@ -24,3 +24,4 @@
 .upload-zone:hover, .upload-zone.dragover { background: rgba(233, 69, 96, 0.1); }
 .upload-zone input { display: none; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; }
+.wardrobe-carousel::-webkit-scrollbar { display: none; }

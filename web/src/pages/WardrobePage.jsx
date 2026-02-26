@@ -1,54 +1,49 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { get, uploadPhoto } from '../api';
+import { uploadPhoto } from '../api';
 
 export default function WardrobePage() {
   const { user } = useApp();
-  const [items, setItems] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [category, setCategory] = useState('t-shirt');
   const [customCategory, setCustomCategory] = useState('');
+  const [pendingFile, setPendingFile] = useState(null);
   const fileRef = useRef(null);
 
   const effectiveCategory = category === 'other' ? (customCategory.trim() || 'other') : category;
   const userTags = category === 'other' && customCategory.trim() ? [customCategory.trim()] : [];
+  const canSave = pendingFile && (category !== 'other' || customCategory.trim());
 
   const userId = user?.id || 'user-1';
 
-  useEffect(() => {
-    get(`/wardrobe/${userId}`).then(d => setItems(d.items || [])).catch(() => setItems([]));
-  }, [userId]);
-
-  const handleFile = async (e) => {
+  const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith('image/')) return;
+    if (file?.type.startsWith('image/')) setPendingFile(file);
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file?.type.startsWith('image/')) setPendingFile(file);
+  };
+
+  const handleSave = async () => {
+    if (!pendingFile || !canSave) return;
     setUploading(true);
     try {
-      const item = await uploadPhoto(userId, file, effectiveCategory, userTags);
-      setItems(prev => [item, ...prev]);
+      await uploadPhoto(userId, pendingFile, effectiveCategory, userTags);
+      setPendingFile(null);
     } catch (err) {
       alert(err.message || 'Upload failed');
     } finally {
       setUploading(false);
-      if (fileRef.current) fileRef.current.value = '';
     }
   };
 
-  const handleDrop = async (e) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file?.type.startsWith('image/')) {
-      setUploading(true);
-      try {
-        const item = await uploadPhoto(userId, file, effectiveCategory, userTags);
-        setItems(prev => [item, ...prev]);
-      } catch (err) {
-        alert(err.message || 'Upload failed');
-      } finally {
-        setUploading(false);
-      }
-    }
+  const handleFile = (e) => {
+    handleFileSelect(e);
   };
 
   const handleDragOver = (e) => {
@@ -63,7 +58,7 @@ export default function WardrobePage() {
         <Link to="/" style={{ color: '#8892b0', fontSize: 14 }}>← Back to Dashboard</Link>
       </div>
       <h1 className="title">My Wardrobe</h1>
-      <p className="subtitle">{items.length} items</p>
+      <p className="subtitle">Add clothes to your wardrobe</p>
 
       <div
         className="upload-zone"
@@ -83,7 +78,6 @@ export default function WardrobePage() {
         >
           Choose photos from device
         </button>
-        {uploading && <p style={{ marginTop: 12, color: '#e94560' }}>Uploading...</p>}
       </div>
 
       <div style={{ marginBottom: 16 }}>
@@ -118,17 +112,24 @@ export default function WardrobePage() {
         </div>
       )}
 
-      <div className="grid">
-        {items.map(item => (
-          <div key={item.id} className="card" style={{ padding: 0, overflow: 'hidden' }}>
-            <img src={item.imageUrl} alt={item.category} style={{ width: '100%', height: 140, objectFit: 'cover' }} />
-            <div style={{ padding: 8 }}>
-              <p style={{ fontSize: 14 }}>{item.category}</p>
-              <p style={{ fontSize: 12, color: '#8892b0' }}>{item.tags?.join(', ') || '—'}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      {pendingFile && (
+        <div style={{ marginBottom: 16 }}>
+          <p style={{ fontSize: 14, color: '#8892b0', marginBottom: 8 }}>
+            Selected: {pendingFile.name}
+            <button type="button" onClick={() => setPendingFile(null)} style={{ marginLeft: 12, background: 'none', border: 'none', color: '#e94560', cursor: 'pointer', fontSize: 12 }}>Remove</button>
+          </p>
+        </div>
+      )}
+
+      <button
+        type="button"
+        className="btn"
+        onClick={handleSave}
+        disabled={!canSave || uploading}
+        style={{ marginBottom: 24 }}
+      >
+        {uploading ? 'Saving...' : 'Save to wardrobe'}
+      </button>
     </div>
   );
 }

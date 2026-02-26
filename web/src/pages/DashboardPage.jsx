@@ -78,6 +78,13 @@ export default function DashboardPage() {
               : 'Add clothes first – your wardrobe is empty'}
           </p>
         </Link>
+        <Link to="/wardrobe-view" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24 }}>
+          <p style={{ fontSize: 40, marginBottom: 8 }}>🖼️</p>
+          <h3>Show wardrobe</h3>
+          <p style={{ color: '#8892b0', marginTop: 4, fontSize: 14 }}>
+            View your dress photos in carousel mode
+          </p>
+        </Link>
         <Link to="/wardrobe" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24 }}>
           <p style={{ fontSize: 40, marginBottom: 8 }}>➕</p>
           <h3>Add clothes</h3>
@@ -87,6 +94,7 @@ export default function DashboardPage() {
 
       <div className="nav" style={{ marginTop: 0 }}>
         <Link to="/wardrobe">➕ Add Clothes</Link>
+        <Link to="/wardrobe-view">🖼️ Show Wardrobe</Link>
         <Link to="/donate">♻️ Declutter</Link>
         <Link to="/profile">👤 Profile</Link>
       </div>
