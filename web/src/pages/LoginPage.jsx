@@ -56,11 +56,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleTryDemo = () => {
-    setUser({ id: 'user-1', phone: '+919876543210', name: 'Demo User', isProfileComplete: true });
-    navigate('/');
-  };
-
   return (
     <div className="container">
       <div className="login-logo">
@@ -71,10 +66,6 @@ export default function LoginPage() {
 
       <h1 className="title">Welcome to DRIP</h1>
       <p className="subtitle">Sign in with your phone number</p>
-
-      <button className="btn btn-secondary" onClick={handleTryDemo} style={{ marginBottom: 24 }}>
-        Try demo (explore prototype)
-      </button>
 
       {error && <p style={{ color: '#e94560', marginBottom: 16, fontSize: 14 }}>{error}</p>}
 
