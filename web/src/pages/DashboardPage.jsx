@@ -82,6 +82,8 @@ export default function DashboardPage() {
   const [selectedForDonate, setSelectedForDonate] = useState([]);
   const [current, setCurrent] = useState(0);
   const [declutterScheduled, setDeclutterScheduled] = useState(false);
+  const [showDripPopup, setShowDripPopup] = useState(false);
+  const [dripValidationMsg, setDripValidationMsg] = useState('');
 
   // Add clothes form state
   const [uploading, setUploading] = useState(false);
@@ -159,6 +161,64 @@ export default function DashboardPage() {
   const handleLogout = () => {
     setUser(null);
     navigate('/login');
+  };
+
+  const TOP_CATEGORIES = ['t-shirt', 'shirt', 'dress', 'blouse', 'top', 'jacket', 'sweater'];
+  const BOTTOM_CATEGORIES = ['pants', 'jeans', 'skirt', 'shorts', 'trousers'];
+  const SHOE_CATEGORIES = ['shoes', 'shoe', 'heel', 'flat', 'sneakers', 'sandals'];
+  const ACCESSORY_CATEGORIES = ['bag', 'watch', 'belt', 'scarf', 'hat', 'accessory'];
+
+  const categorizeItems = (list) => {
+    const tops = [], bottoms = [], shoes = [], accessories = [];
+    for (const item of list) {
+      const cat = (item.category || '').toLowerCase();
+      const tagStr = (item.tags || []).join(' ').toLowerCase();
+      const combined = `${cat} ${tagStr}`;
+      if (TOP_CATEGORIES.some(t => cat.includes(t) || combined.includes(t))) tops.push(item);
+      else if (BOTTOM_CATEGORIES.some(b => cat.includes(b) || combined.includes(b))) bottoms.push(item);
+      else if (SHOE_CATEGORIES.some(s => cat.includes(s) || combined.includes(s))) shoes.push(item);
+      else if (ACCESSORY_CATEGORIES.some(a => cat.includes(a) || combined.includes(a))) accessories.push(item);
+      else tops.push(item);
+    }
+    return { tops, bottoms, shoes, accessories };
+  };
+
+  const buildOutfitCombos = () => {
+    const { tops, bottoms, shoes, accessories } = categorizeItems(items);
+    const combos = [];
+    const topList = tops.length ? tops : items;
+    const bottomList = bottoms.length ? bottoms : [null];
+    const shoeList = shoes.length ? shoes : null;
+    const accList = accessories.length ? accessories : null;
+    for (const top of topList) {
+      for (const bottom of bottomList) {
+        combos.push({
+          id: `combo-${top?.id || 't'}-${bottom?.id || 'b'}-${combos.length}`,
+          top: top || null,
+          bottom: bottom || null,
+          shoes: shoeList ? shoeList[Math.floor(Math.random() * shoeList.length)] : null,
+          accessories: accList?.length ? accList[Math.floor(Math.random() * accList.length)] : null,
+        });
+      }
+    }
+    return combos.length ? combos : [{ id: 'single', top: items[0], bottom: null, shoes: null, accessories: null }];
+  };
+
+  const handleShowDrip = () => {
+    setDripValidationMsg('');
+    if (!selectedOccasion) {
+      setDripValidationMsg('Please select an Occasion');
+      return;
+    }
+    if (!outfitPrefs.dayNight) {
+      setDripValidationMsg('Please select Day or Night');
+      return;
+    }
+    if (items.length === 0) {
+      setDripValidationMsg('Add clothes to your wardrobe first');
+      return;
+    }
+    setShowDripPopup(true);
   };
 
   if (declutterScheduled) {
@@ -311,7 +371,7 @@ export default function DashboardPage() {
               {isFemale && (
                 <>
                   <p style={{ marginBottom: 8, color: '#8892b0', fontWeight: 600 }}>Shoe type</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
                     {SHOE_FEMALE.map(s => (
                       <span
                         key={s.key}
@@ -324,6 +384,13 @@ export default function DashboardPage() {
                   </div>
                 </>
               )}
+
+              {dripValidationMsg && (
+                <p style={{ color: '#e94560', fontSize: 14, marginBottom: 12 }}>{dripValidationMsg}</p>
+              )}
+              <button className="btn" onClick={handleShowDrip} style={{ marginTop: 8 }}>
+                Show my DRIP
+              </button>
             </div>
           </>
         )}
@@ -506,6 +573,74 @@ export default function DashboardPage() {
           </button>
         ))}
       </footer>
+
+      {showDripPopup && (
+        <DripPopup
+          outfits={buildOutfitCombos()}
+          onClose={() => setShowDripPopup(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function DripPopup({ outfits, onClose }) {
+  const [idx, setIdx] = useState(0);
+  const outfit = outfits[idx];
+  if (!outfit) return null;
+
+  const goPrev = () => setIdx(i => (i - 1 + outfits.length) % outfits.length);
+  const goNext = () => setIdx(i => (i + 1) % outfits.length);
+
+  return (
+    <div className="drip-popup-overlay" onClick={onClose}>
+      <div className="drip-popup" onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h2 style={{ fontSize: 20, margin: 0 }}>Your DRIP</h2>
+          <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', color: '#8892b0', fontSize: 24, cursor: 'pointer' }}>×</button>
+        </div>
+        <div className="drip-carousel-wrap">
+          <button type="button" className="drip-nav-btn" onClick={goPrev}>‹</button>
+          <div className="drip-outfit-card">
+            <div className="drip-outfit-grid">
+              <div className="drip-outfit-item">
+                <div className="drip-outfit-label">Top</div>
+                <div className="drip-outfit-img">
+                  {outfit.top?.imageUrl ? <img src={outfit.top.imageUrl} alt={outfit.top.category} /> : <span>—</span>}
+                </div>
+                <div className="drip-outfit-name">{outfit.top?.category || '—'}</div>
+              </div>
+              <div className="drip-outfit-item">
+                <div className="drip-outfit-label">Bottom</div>
+                <div className="drip-outfit-img">
+                  {outfit.bottom?.imageUrl ? <img src={outfit.bottom.imageUrl} alt={outfit.bottom.category} /> : <span>—</span>}
+                </div>
+                <div className="drip-outfit-name">{outfit.bottom?.category || '—'}</div>
+              </div>
+              {outfit.shoes && (
+                <div className="drip-outfit-item">
+                  <div className="drip-outfit-label">Shoes</div>
+                  <div className="drip-outfit-img">
+                    <img src={outfit.shoes.imageUrl} alt={outfit.shoes.category} />
+                  </div>
+                  <div className="drip-outfit-name">{outfit.shoes.category}</div>
+                </div>
+              )}
+              {outfit.accessories && (
+                <div className="drip-outfit-item">
+                  <div className="drip-outfit-label">Accessory</div>
+                  <div className="drip-outfit-img">
+                    <img src={outfit.accessories.imageUrl} alt={outfit.accessories.category} />
+                  </div>
+                  <div className="drip-outfit-name">{outfit.accessories.category}</div>
+                </div>
+              )}
+            </div>
+          </div>
+          <button type="button" className="drip-nav-btn" onClick={goNext}>›</button>
+        </div>
+        <p style={{ textAlign: 'center', color: '#8892b0', fontSize: 14 }}>{idx + 1} / {outfits.length}</p>
+      </div>
     </div>
   );
 }
