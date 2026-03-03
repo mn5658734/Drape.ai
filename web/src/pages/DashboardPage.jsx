@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { get } from '../api';
+import { get, post, uploadPhoto } from '../api';
 
 const OCCASIONS = [
   { key: 'office', label: 'Office' },
@@ -12,19 +12,46 @@ const OCCASIONS = [
   { key: 'interview', label: 'Interview' },
 ];
 
+const TABS = [
+  { key: 'wardrobe', label: 'Digital Wardrobe', icon: '👗' },
+  { key: 'add', label: '+ Add clothes', icon: '➕' },
+  { key: 'declutter', label: 'Declutter', icon: '♻️' },
+  { key: 'profile', label: 'Profile', icon: '👤' },
+];
+
 export default function DashboardPage() {
-  const { user, selectedOccasion, setSelectedOccasion } = useApp();
+  const { user, setUser, selectedOccasion, setSelectedOccasion } = useApp();
+  const navigate = useNavigate();
+  const [tab, setTab] = useState('wardrobe');
   const [weather, setWeather] = useState(null);
-  const [wardrobeCount, setWardrobeCount] = useState(null);
+  const [items, setItems] = useState([]);
+  const [selectedForDonate, setSelectedForDonate] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [declutterScheduled, setDeclutterScheduled] = useState(false);
+
+  // Add clothes form state
+  const [uploading, setUploading] = useState(false);
+  const [category, setCategory] = useState('t-shirt');
+  const [customCategory, setCustomCategory] = useState('');
+  const [tags, setTags] = useState('');
+  const [pendingFile, setPendingFile] = useState(null);
+  const fileRef = useRef(null);
+  const scrollRef = useRef(null);
 
   const userId = user?.id || 'user-1';
+  const effectiveCategory = category === 'other' ? (customCategory.trim() || 'other') : category;
+  const userTags = [
+    ...(category === 'other' && customCategory.trim() ? [customCategory.trim()] : []),
+    ...(tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : []),
+  ];
+  const canSave = pendingFile && (category !== 'other' || customCategory.trim());
 
   useEffect(() => {
     get('/weather?city=Mumbai').then(setWeather).catch(() => setWeather({ temperature: 24, condition: 'Sunny' }));
   }, []);
 
   useEffect(() => {
-    get(`/wardrobe/${userId}`).then(d => setWardrobeCount((d.items || []).length)).catch(() => setWardrobeCount(0));
+    get(`/wardrobe/${userId}`).then(d => setItems(d.items || [])).catch(() => setItems([]));
   }, [userId]);
 
   const greeting = () => {
@@ -33,6 +60,61 @@ export default function DashboardPage() {
     if (h < 17) return 'Good Afternoon';
     return 'Good Evening';
   };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file?.type.startsWith('image/')) setPendingFile(file);
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file?.type.startsWith('image/')) setPendingFile(file);
+  };
+
+  const handleSave = async () => {
+    if (!pendingFile || !canSave) return;
+    setUploading(true);
+    try {
+      const item = await uploadPhoto(userId, pendingFile, effectiveCategory, userTags);
+      setItems(prev => [item, ...prev]);
+      setPendingFile(null);
+      setTab('wardrobe');
+    } catch (err) {
+      alert(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const toggleDonateSelect = (id) => {
+    setSelectedForDonate(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleSchedulePickup = () => {
+    post('/donate/schedule', { userId, itemIds: selectedForDonate, partnerId: 'ngo-1' })
+      .then(() => setDeclutterScheduled(true))
+      .catch(() => setDeclutterScheduled(true));
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    navigate('/login');
+  };
+
+  if (declutterScheduled) {
+    return (
+      <div className="container">
+        <p style={{ fontSize: 64, textAlign: 'center', marginTop: 80 }}>❤️</p>
+        <h1 className="title" style={{ textAlign: 'center' }}>Pickup Scheduled!</h1>
+        <p className="subtitle" style={{ textAlign: 'center' }}>You helped someone today. Tentative pickup: Tomorrow 10 AM</p>
+        <button className="btn" onClick={() => setDeclutterScheduled(false)}>Back to Dashboard</button>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
@@ -59,27 +141,209 @@ export default function DashboardPage() {
               key={o.key}
               className={`chip ${selectedOccasion === o.key ? 'active' : ''}`}
               onClick={() => setSelectedOccasion(o.key)}
-            >{o.label}</span>
+            >
+              {o.label}
+            </span>
           ))}
         </div>
       </div>
 
-      <div style={{ display: 'grid', gap: 12, marginBottom: 24 }}>
-        <Link to="/wardrobe" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24 }}>
-          <p style={{ fontSize: 40, marginBottom: 8 }}>👗</p>
-          <h3>Digital wardrobe</h3>
-          <p style={{ color: '#8892b0', marginTop: 4, fontSize: 14 }}>
-            {wardrobeCount > 0
-              ? `Add clothes & view ${wardrobeCount} items in carousel`
-              : 'Add clothes – carousel view once uploaded'}
-          </p>
-        </Link>
+      <div className="nav" style={{ marginBottom: 24 }}>
+        {TABS.map(t => (
+          <button
+            key={t.key}
+            type="button"
+            className={`nav-tab ${tab === t.key ? 'active' : ''}`}
+            onClick={() => setTab(t.key)}
+            style={{
+              padding: '10px 16px',
+              background: tab === t.key ? '#e94560' : '#16213e',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: 14,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <span>{t.icon}</span>
+            <span>{t.label}</span>
+          </button>
+        ))}
       </div>
 
-      <div className="nav" style={{ marginTop: 0 }}>
-        <Link to="/wardrobe">👗 Digital Wardrobe</Link>
-        <Link to="/donate">♻️ Declutter</Link>
-        <Link to="/profile">👤 Profile</Link>
+      <div className="card" style={{ minHeight: 200 }}>
+        {tab === 'wardrobe' && (
+          <>
+            <h2 style={{ fontSize: 20, marginBottom: 12 }}>Your wardrobe</h2>
+            <p style={{ color: '#8892b0', marginBottom: 16 }}>{items.length} items</p>
+            {items.length === 0 ? (
+              <p style={{ color: '#8892b0' }}>No clothes yet. Use <strong>+ Add clothes</strong> to add photos.</p>
+            ) : (
+              <div
+                ref={scrollRef}
+                className="wardrobe-carousel"
+                onScroll={(e) => {
+                  const el = e.target;
+                  const cardWidth = 200 + 16;
+                  const idx = Math.round(el.scrollLeft / cardWidth);
+                  setCurrent(Math.min(Math.max(0, idx), items.length - 1));
+                }}
+                style={{
+                  display: 'flex',
+                  gap: 16,
+                  overflowX: 'auto',
+                  scrollSnapType: 'x mandatory',
+                  padding: '8px 0',
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                }}
+              >
+                {items.map((item, i) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      flex: '0 0 200px',
+                      scrollSnapAlign: 'center',
+                      background: '#16213e',
+                      borderRadius: 12,
+                      overflow: 'hidden',
+                      transform: i === current ? 'scale(1.02)' : 'scale(0.98)',
+                      transition: 'transform 0.2s',
+                    }}
+                  >
+                    <div style={{ aspectRatio: '3/4', background: '#0f0f23' }}>
+                      <img src={item.imageUrl} alt={item.category} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <div style={{ padding: 8 }}>
+                      <p style={{ fontSize: 14, fontWeight: 600 }}>{item.category}</p>
+                      <p style={{ fontSize: 12, color: '#8892b0' }}>{item.tags?.join(', ') || '—'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {tab === 'add' && (
+          <>
+            <h2 style={{ fontSize: 20, marginBottom: 12 }}>Add clothes</h2>
+            <div
+              className="upload-zone"
+              onDrop={handleDrop}
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); }}
+              onDragLeave={(e) => e.currentTarget.classList.remove('dragover')}
+            >
+              <input ref={fileRef} type="file" accept="image/*" onChange={(e) => handleFileSelect(e)} style={{ display: 'none' }} />
+              <p style={{ fontSize: 32, marginBottom: 8 }}>📷</p>
+              <p style={{ color: '#8892b0', marginBottom: 8 }}>Upload from device storage</p>
+              <button type="button" className="btn btn-secondary" onClick={() => fileRef.current?.click()} style={{ maxWidth: 240 }}>
+                Choose photos
+              </button>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <label style={{ display: 'block', marginBottom: 8, color: '#8892b0' }}>Category:</label>
+              <select value={category} onChange={(e) => { setCategory(e.target.value); if (e.target.value !== 'other') setCustomCategory(''); }} className="input" style={{ width: '100%', marginBottom: 12 }}>
+                <option value="t-shirt">T-shirt</option>
+                <option value="shirt">Shirt</option>
+                <option value="pants">Pants</option>
+                <option value="jeans">Jeans</option>
+                <option value="dress">Dress</option>
+                <option value="other">Other (custom)</option>
+              </select>
+              {category === 'other' && (
+                <input className="input" placeholder="Name your category" value={customCategory} onChange={(e) => setCustomCategory(e.target.value)} style={{ marginBottom: 12 }} />
+              )}
+              <input className="input" placeholder="Tags (e.g. office, casual)" value={tags} onChange={(e) => setTags(e.target.value)} style={{ marginBottom: 12 }} />
+              {pendingFile && <p style={{ fontSize: 14, color: '#8892b0', marginBottom: 8 }}>Selected: {pendingFile.name}</p>}
+              <button className="btn" onClick={handleSave} disabled={!canSave || uploading}>
+                {uploading ? 'Saving...' : 'Save to wardrobe'}
+              </button>
+            </div>
+          </>
+        )}
+
+        {tab === 'declutter' && (
+          <>
+            <h2 style={{ fontSize: 20, marginBottom: 12 }}>Select items to donate</h2>
+            <p style={{ color: '#8892b0', marginBottom: 16 }}>Choose photos from carousel. We'll schedule a pickup.</p>
+            {items.length === 0 ? (
+              <p style={{ color: '#8892b0' }}>No clothes in wardrobe. Add clothes first.</p>
+            ) : (
+              <>
+                <div
+                  ref={scrollRef}
+                  className="wardrobe-carousel"
+                  style={{
+                    display: 'flex',
+                    gap: 16,
+                    overflowX: 'auto',
+                    scrollSnapType: 'x mandatory',
+                    padding: '8px 0',
+                    marginBottom: 24,
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                  }}
+                >
+                  {items.map((item, i) => (
+                    <div
+                      key={item.id}
+                      onClick={() => toggleDonateSelect(item.id)}
+                      style={{
+                        flex: '0 0 200px',
+                        scrollSnapAlign: 'center',
+                        background: selectedForDonate.includes(item.id) ? 'rgba(233,69,96,0.2)' : '#16213e',
+                        borderRadius: 12,
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        border: selectedForDonate.includes(item.id) ? '2px solid #e94560' : '2px solid transparent',
+                      }}
+                    >
+                      <div style={{ padding: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <input type="radio" checked={selectedForDonate.includes(item.id)} readOnly style={{ accentColor: '#e94560' }} />
+                        <span style={{ fontSize: 12, color: '#8892b0' }}>Select</span>
+                      </div>
+                      <div style={{ aspectRatio: '3/4', background: '#0f0f23' }}>
+                        <img src={item.imageUrl} alt={item.category} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                      <div style={{ padding: 8 }}>
+                        <p style={{ fontSize: 14 }}>{item.category}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  className="btn"
+                  onClick={handleSchedulePickup}
+                  disabled={selectedForDonate.length === 0}
+                >
+                  Schedule Pickup ({selectedForDonate.length} selected)
+                </button>
+              </>
+            )}
+          </>
+        )}
+
+        {tab === 'profile' && (
+          <>
+            <h2 style={{ fontSize: 20, marginBottom: 12 }}>Profile</h2>
+            <div style={{ marginBottom: 16 }}>
+              <p style={{ fontSize: 12, color: '#8892b0' }}>Name</p>
+              <p style={{ marginTop: 4 }}>{user?.name || 'User'}</p>
+              <p style={{ fontSize: 12, color: '#8892b0', marginTop: 12 }}>Phone</p>
+              <p style={{ marginTop: 4 }}>{user?.phone || '+91 98765 43210'}</p>
+            </div>
+            <Link to="/profile" className="btn btn-secondary" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+              Full Profile
+            </Link>
+            <button className="btn btn-secondary" onClick={handleLogout} style={{ marginTop: 12 }}>
+              Log out
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
