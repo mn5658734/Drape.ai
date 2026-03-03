@@ -17,5 +17,5 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Drape.ai API running at http://localhost:${PORT}`);
+  console.log(`🚀 DRIP API running at http://localhost:${PORT}`);
 });

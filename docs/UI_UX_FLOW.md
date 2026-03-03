@@ -1,4 +1,4 @@
-# Drape.ai UI/UX Flow
+# DRIP UI/UX Flow
 
 ## Clickable Prototype Flow
 

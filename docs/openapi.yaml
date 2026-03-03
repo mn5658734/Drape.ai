@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Drape.ai API
+  title: DRIP API
   description: AI-powered digital wardrobe API
   version: 1.0.0
 

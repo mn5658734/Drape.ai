@@ -16,7 +16,7 @@ export default function ProfileSetupPage() {
 
   const handleComplete = () => {
     setUser({ ...user, gender, preferredStyle: style, skinTone, isProfileComplete: true });
-    navigate('/wardrobe');
+    navigate('/');
   };
 
   return (

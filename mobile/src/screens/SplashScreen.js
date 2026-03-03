@@ -10,7 +10,7 @@ export default function SplashScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>👗</Text>
-      <Text style={styles.title}>Drape.ai</Text>
+      <Text style={styles.title}>DRIP</Text>
       <Text style={styles.tagline}>Open App. Get Outfit. Step Out.</Text>
       <Pressable style={styles.skip} onPress={() => navigation.replace('Login')}>
         <Text style={styles.skipText}>Skip</Text>

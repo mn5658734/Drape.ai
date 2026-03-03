@@ -1,10 +1,10 @@
 /**
- * Google Drive integration for Drape.ai
+ * Google Drive integration for DRIP
  * Stores cloth photos and generated outfit photos in:
  * https://drive.google.com/drive/u/0/folders/1lKPyq3zHIo9Oytr6EEcwqWl03XyebwRP
  *
  * Folder structure:
- *   /Drape.ai Photos/
+ *   /DRIP Photos/
  *     /{userId}/
  *       /clothes/     - wardrobe item photos
  *       /outfits/     - saved outfit composite images

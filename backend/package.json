@@ -1,7 +1,7 @@
 {
   "name": "drape-ai-backend",
   "version": "1.0.0",
-  "description": "Drape.ai - AI-powered digital wardrobe API",
+  "description": "DRIP - AI-powered digital wardrobe API",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

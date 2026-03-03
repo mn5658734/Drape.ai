@@ -1,4 +1,4 @@
-# Drape.ai Web
+# DRIP Web
 
 Web-based digital wardrobe with photo upload.
 

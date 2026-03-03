@@ -63,7 +63,7 @@ export default function LoginPage() {
 
   return (
     <div className="container">
-      <h1 className="title">Welcome to Drape.ai</h1>
+      <h1 className="title">Welcome to DRIP</h1>
       <p className="subtitle">Sign in with your phone number</p>
 
       <button className="btn btn-secondary" onClick={handleTryDemo} style={{ marginBottom: 24 }}>

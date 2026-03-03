@@ -59,7 +59,7 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Drape.ai</Text>
+      <Text style={styles.title}>Welcome to DRIP</Text>
       <Text style={styles.subtitle}>Sign in with your phone number</Text>
 
       {step === 'phone' ? (

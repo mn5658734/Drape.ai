@@ -1,4 +1,4 @@
-# Drape.ai API Documentation
+# DRIP API Documentation
 
 **Base URL:** `http://localhost:3000/api`  
 **Version:** 1.0.0
@@ -551,7 +551,7 @@ GET /health
 ```json
 {
   "status": "ok",
-  "service": "drape-ai-api",
+  "service": "drip-api",
   "timestamp": "2025-02-27T12:00:00.000Z"
 }
 ```

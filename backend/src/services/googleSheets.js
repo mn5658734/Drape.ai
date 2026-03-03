@@ -1,5 +1,5 @@
 /**
- * Google Sheets integration for Drape.ai
+ * Google Sheets integration for DRIP
  * Syncs Users, WardrobeItems, Outfits, Donations, Collections to:
  * https://docs.google.com/spreadsheets/d/1fHk9AdcVi_Chdg2hM6IrjYObMKy1oI9clWczJXqCdOg
  */

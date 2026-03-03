@@ -1,9 +1,9 @@
-# Google Sheets & Drive Setup for Drape.ai
+# Google Sheets & Drive Setup for DRIP
 
-This guide explains how to connect Drape.ai to:
+This guide explains how to connect DRIP to:
 
-- **Google Sheets** – [Drape.ai Spreadsheet](https://docs.google.com/spreadsheets/d/1fHk9AdcVi_Chdg2hM6IrjYObMKy1oI9clWczJXqCdOg/edit?usp=sharing) (user signup, wardrobe items, outfits, donations, collections)
-- **Google Drive** – [Drape.ai Photos Folder](https://drive.google.com/drive/u/0/folders/1lKPyq3zHIo9Oytr6EEcwqWl03XyebwRP) (cloth photos, saved outfit images)
+- **Google Sheets** – [DRIP Spreadsheet](https://docs.google.com/spreadsheets/d/1fHk9AdcVi_Chdg2hM6IrjYObMKy1oI9clWczJXqCdOg/edit?usp=sharing) (user signup, wardrobe items, outfits, donations, collections)
+- **Google Drive** – [DRIP Photos Folder](https://drive.google.com/drive/u/0/folders/1lKPyq3zHIo9Oytr6EEcwqWl03XyebwRP) (cloth photos, saved outfit images)
 
 ---
 
@@ -33,14 +33,14 @@ This guide explains how to connect Drape.ai to:
 
 ### Google Sheets
 
-1. Open the [Drape.ai Spreadsheet](https://docs.google.com/spreadsheets/d/1fHk9AdcVi_Chdg2hM6IrjYObMKy1oI9clWczJXqCdOg/edit?usp=sharing)
+1. Open the [DRIP Spreadsheet](https://docs.google.com/spreadsheets/d/1fHk9AdcVi_Chdg2hM6IrjYObMKy1oI9clWczJXqCdOg/edit?usp=sharing)
 2. Click **Share**
 3. Add the service account email (e.g. `drape-ai-backend@your-project.iam.gserviceaccount.com`)
 4. Grant **Editor** access
 
 ### Google Drive
 
-1. Open the [Drape.ai Photos Folder](https://drive.google.com/drive/u/0/folders/1lKPyq3zHIo9Oytr6EEcwqWl03XyebwRP)
+1. Open the [DRIP Photos Folder](https://drive.google.com/drive/u/0/folders/1lKPyq3zHIo9Oytr6EEcwqWl03XyebwRP)
 2. Click **Share**
 3. Add the same service account email
 4. Grant **Editor** access
@@ -78,7 +78,7 @@ When the backend runs, it creates these sheets if they don’t exist:
 ## 6. Drive Folder Structure
 
 ```
-Drape.ai Photos (1lKPyq3zHIo9Oytr6EEcwqWl03XyebwRP)/
+DRIP Photos (1lKPyq3zHIo9Oytr6EEcwqWl03XyebwRP)/
 ├── user-1/
 │   ├── clothes/     ← Wardrobe item photos
 │   └── outfits/     ← Saved outfit composite images

@@ -10,19 +10,73 @@ const OCCASIONS = [
   { key: 'trip', label: 'Trip' },
   { key: 'casual_hangout', label: 'Casual' },
   { key: 'interview', label: 'Interview' },
+  { key: 'wedding', label: 'Wedding' },
+  { key: 'gym', label: 'Gym' },
+  { key: 'beach', label: 'Beach' },
+  { key: 'brunch', label: 'Brunch' },
+  { key: 'meeting', label: 'Meeting' },
+  { key: 'date_night', label: 'Date Night' },
+  { key: 'family_gathering', label: 'Family Gathering' },
+  { key: 'conference', label: 'Conference' },
+  { key: 'outing', label: 'Outing' },
+  { key: 'festival', label: 'Festival' },
+  { key: 'formal_dinner', label: 'Formal Dinner' },
+  { key: 'picnic', label: 'Picnic' },
+  { key: 'travel', label: 'Travel' },
+];
+
+const DAY_NIGHT = [
+  { key: 'day', label: 'Day' },
+  { key: 'night', label: 'Night' },
+];
+
+const HAIR_MALE = [
+  { key: 'short', label: 'Short' },
+  { key: 'medium', label: 'Medium' },
+  { key: 'long', label: 'Long' },
+  { key: 'bald', label: 'Bald' },
+  { key: 'slicked_back', label: 'Slicked back' },
+  { key: 'messy', label: 'Messy' },
+  { key: 'ponytail', label: 'Ponytail' },
+];
+
+const HAIR_FEMALE = [
+  { key: 'short', label: 'Short' },
+  { key: 'medium', label: 'Medium' },
+  { key: 'long', label: 'Long' },
+  { key: 'updo', label: 'Updo' },
+  { key: 'ponytail', label: 'Ponytail' },
+  { key: 'braid', label: 'Braid' },
+  { key: 'loose', label: 'Loose' },
+  { key: 'bun', label: 'Bun' },
+];
+
+const SLEEVE = [
+  { key: 'full', label: 'Full sleeve' },
+  { key: 'half', label: 'Half sleeve' },
+  { key: 'sleeveless', label: 'Sleeveless' },
+];
+
+const SHOE_FEMALE = [
+  { key: 'heel', label: 'Heel' },
+  { key: 'flat', label: 'Flat' },
+  { key: 'sneakers', label: 'Sneakers' },
+  { key: 'shoes', label: 'Shoes' },
+  { key: 'half_shoes', label: 'Half shoes' },
 ];
 
 const FOOTER_TABS = [
-  { key: 'home', label: 'HOME', icon: '🏠' },
+  { key: 'home', label: 'HOME', icon: '🧥' },
   { key: 'wardrobe', label: 'WARDROBE', icon: '👗' },
   { key: 'declutter', label: 'DECLUTTER', icon: '♻️' },
   { key: 'profile', label: 'PROFILE', icon: '👤' },
 ];
 
 export default function DashboardPage() {
-  const { user, setUser, selectedOccasion, setSelectedOccasion } = useApp();
+  const { user, setUser, selectedOccasion, setSelectedOccasion, outfitPrefs, setOutfitPrefs } = useApp();
   const navigate = useNavigate();
   const [tab, setTab] = useState('home');
+  const isFemale = user?.gender === 'female';
   const [weather, setWeather] = useState(null);
   const [items, setItems] = useState([]);
   const [selectedForDonate, setSelectedForDonate] = useState([]);
@@ -142,32 +196,135 @@ export default function DashboardPage() {
             <h2 style={{ fontSize: 20 }}>🔥 I'm Getting Late!</h2>
             <p style={{ fontSize: 14, opacity: 0.9 }}>AI picks best outfit in 3 sec</p>
           </Link>
-          <div style={{ marginBottom: 16 }}>
-            <p style={{ marginBottom: 8, color: '#8892b0' }}>What's the Occasion?</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {OCCASIONS.map(o => (
-                <span
-                  key={o.key}
-                  className={`chip ${selectedOccasion === o.key ? 'active' : ''}`}
-                  onClick={() => setSelectedOccasion(o.key)}
-                >
-                  {o.label}
-                </span>
-              ))}
-            </div>
-          </div>
         </>
       )}
 
       <div className="card" style={{ minHeight: 200, marginBottom: 80 }}>
         {tab === 'home' && (
           <>
-            <h2 style={{ fontSize: 20, marginBottom: 12 }}>Quick actions</h2>
-            <Link to="/wardrobe" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24, marginBottom: 0 }}>
-              <p style={{ fontSize: 40, marginBottom: 8 }}>👗</p>
-              <h3>Digital wardrobe</h3>
-              <p style={{ color: '#8892b0', marginTop: 4, fontSize: 14 }}>{items.length} items • Add & view clothes</p>
-            </Link>
+            <h2 style={{ fontSize: 20, marginBottom: 12 }}>Digital wardrobe</h2>
+            <p style={{ color: '#8892b0', marginBottom: 16 }}>{items.length} items</p>
+            {items.length === 0 ? (
+              <div className="upload-zone" style={{ marginBottom: 0, cursor: 'pointer' }} onClick={() => setTab('wardrobe')}>
+                <p style={{ fontSize: 32, marginBottom: 8 }}>👗</p>
+                <p style={{ color: '#8892b0' }}>No clothes yet. Tap to add photos.</p>
+              </div>
+            ) : (
+              <div
+                ref={scrollRef}
+                className="wardrobe-carousel"
+                onScroll={(e) => {
+                  const el = e.target;
+                  const cardWidth = 200 + 16;
+                  const idx = Math.round(el.scrollLeft / cardWidth);
+                  setCurrent(Math.min(Math.max(0, idx), items.length - 1));
+                }}
+                style={{
+                  display: 'flex',
+                  gap: 16,
+                  overflowX: 'auto',
+                  scrollSnapType: 'x mandatory',
+                  padding: '8px 0',
+                  marginBottom: 24,
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                }}
+              >
+                {items.map((item, i) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      flex: '0 0 200px',
+                      scrollSnapAlign: 'center',
+                      background: '#16213e',
+                      borderRadius: 12,
+                      overflow: 'hidden',
+                      transform: i === current ? 'scale(1.02)' : 'scale(0.98)',
+                      transition: 'transform 0.2s',
+                    }}
+                  >
+                    <div style={{ aspectRatio: '3/4', background: '#0f0f23' }}>
+                      <img src={item.imageUrl} alt={item.category} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <div style={{ padding: 8 }}>
+                      <p style={{ fontSize: 14, fontWeight: 600 }}>{item.category}</p>
+                      <p style={{ fontSize: 12, color: '#8892b0' }}>{item.tags?.join(', ') || '—'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ borderTop: '1px solid #16213e', paddingTop: 24, marginTop: 24 }}>
+              <p style={{ marginBottom: 8, color: '#8892b0', fontWeight: 600 }}>Occasion</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                {OCCASIONS.map(o => (
+                  <span
+                    key={o.key}
+                    className={`chip ${selectedOccasion === o.key ? 'active' : ''}`}
+                    onClick={() => setSelectedOccasion(o.key)}
+                  >
+                    {o.label}
+                  </span>
+                ))}
+              </div>
+
+              <p style={{ marginBottom: 8, color: '#8892b0', fontWeight: 600 }}>Day or Night?</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                {DAY_NIGHT.map(d => (
+                  <span
+                    key={d.key}
+                    className={`chip ${outfitPrefs.dayNight === d.key ? 'active' : ''}`}
+                    onClick={() => setOutfitPrefs(p => ({ ...p, dayNight: d.key }))}
+                  >
+                    {d.label}
+                  </span>
+                ))}
+              </div>
+
+              <p style={{ marginBottom: 8, color: '#8892b0', fontWeight: 600 }}>Hair style</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                {(isFemale ? HAIR_FEMALE : HAIR_MALE).map(h => (
+                  <span
+                    key={h.key}
+                    className={`chip ${outfitPrefs.hairStyle === h.key ? 'active' : ''}`}
+                    onClick={() => setOutfitPrefs(p => ({ ...p, hairStyle: h.key }))}
+                  >
+                    {h.label}
+                  </span>
+                ))}
+              </div>
+
+              <p style={{ marginBottom: 8, color: '#8892b0', fontWeight: 600 }}>Sleeve preference</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                {SLEEVE.map(s => (
+                  <span
+                    key={s.key}
+                    className={`chip ${outfitPrefs.sleeveType === s.key ? 'active' : ''}`}
+                    onClick={() => setOutfitPrefs(p => ({ ...p, sleeveType: s.key }))}
+                  >
+                    {s.label}
+                  </span>
+                ))}
+              </div>
+
+              {isFemale && (
+                <>
+                  <p style={{ marginBottom: 8, color: '#8892b0', fontWeight: 600 }}>Shoe type</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {SHOE_FEMALE.map(s => (
+                      <span
+                        key={s.key}
+                        className={`chip ${outfitPrefs.shoeType === s.key ? 'active' : ''}`}
+                        onClick={() => setOutfitPrefs(p => ({ ...p, shoeType: s.key }))}
+                      >
+                        {s.label}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </>
         )}
 

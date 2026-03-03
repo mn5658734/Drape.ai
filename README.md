@@ -1,4 +1,4 @@
-# Drape.ai
+# DRIP
 
 **Tagline:** Open App. Get Outfit. Step Out.
 
@@ -108,7 +108,7 @@ See [docs/UI_UX_FLOW.md](docs/UI_UX_FLOW.md)
 cd drape-ai
 git init
 git add .
-git commit -m "Initial commit: Drape.ai scaffold"
+git commit -m "Initial commit: DRIP scaffold"
 git remote add origin https://github.com/YOUR_USERNAME/drape-ai.git
 git push -u origin main
 ```

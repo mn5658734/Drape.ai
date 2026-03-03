@@ -1,4 +1,4 @@
-# Drape.ai Database Schema
+# DRIP Database Schema
 
 **Primary:** MongoDB (with Mongoose ODM)  
 **Sync:** [Google Sheets](https://docs.google.com/spreadsheets/d/1fHk9AdcVi_Chdg2hM6IrjYObMKy1oI9clWczJXqCdOg) – Users, WardrobeItems, Outfits, Donations, Collections
