@@ -65,6 +65,7 @@ export default function LoginPage() {
       </div>
 
       <h1 className="title">Welcome to DRIP</h1>
+      <p className="tagline">Your digital wardrobe</p>
       <p className="subtitle">Sign in with your phone number</p>
 
       {error && <p style={{ color: '#e94560', marginBottom: 16, fontSize: 14 }}>{error}</p>}
