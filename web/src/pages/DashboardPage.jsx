@@ -12,17 +12,17 @@ const OCCASIONS = [
   { key: 'interview', label: 'Interview' },
 ];
 
-const TABS = [
-  { key: 'wardrobe', label: 'Digital Wardrobe', icon: '👗' },
-  { key: 'add', label: '+ Add clothes', icon: '➕' },
-  { key: 'declutter', label: 'Declutter', icon: '♻️' },
-  { key: 'profile', label: 'Profile', icon: '👤' },
+const FOOTER_TABS = [
+  { key: 'home', label: 'HOME', icon: '🏠' },
+  { key: 'wardrobe', label: 'WARDROBE', icon: '👗' },
+  { key: 'declutter', label: 'DECLUTTER', icon: '♻️' },
+  { key: 'profile', label: 'PROFILE', icon: '👤' },
 ];
 
 export default function DashboardPage() {
   const { user, setUser, selectedOccasion, setSelectedOccasion } = useApp();
   const navigate = useNavigate();
-  const [tab, setTab] = useState('wardrobe');
+  const [tab, setTab] = useState('home');
   const [weather, setWeather] = useState(null);
   const [items, setItems] = useState([]);
   const [selectedForDonate, setSelectedForDonate] = useState([]);
@@ -34,7 +34,7 @@ export default function DashboardPage() {
   const [category, setCategory] = useState('t-shirt');
   const [customCategory, setCustomCategory] = useState('');
   const [tags, setTags] = useState('');
-  const [pendingFile, setPendingFile] = useState(null);
+  const [pendingFiles, setPendingFiles] = useState([]);
   const fileRef = useRef(null);
   const scrollRef = useRef(null);
 
@@ -44,7 +44,7 @@ export default function DashboardPage() {
     ...(category === 'other' && customCategory.trim() ? [customCategory.trim()] : []),
     ...(tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : []),
   ];
-  const canSave = pendingFile && (category !== 'other' || customCategory.trim());
+  const canSave = pendingFiles.length > 0 && (category !== 'other' || customCategory.trim());
 
   useEffect(() => {
     get('/weather?city=Mumbai').then(setWeather).catch(() => setWeather({ temperature: 24, condition: 'Sunny' }));
@@ -62,24 +62,26 @@ export default function DashboardPage() {
   };
 
   const handleFileSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (file?.type.startsWith('image/')) setPendingFile(file);
+    const files = Array.from(e.target.files || []).filter(f => f.type.startsWith('image/'));
+    if (files.length) setPendingFiles(files);
     if (fileRef.current) fileRef.current.value = '';
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file?.type.startsWith('image/')) setPendingFile(file);
+    const files = Array.from(e.dataTransfer.files || []).filter(f => f.type.startsWith('image/'));
+    if (files.length) setPendingFiles(prev => [...prev, ...files]);
   };
 
   const handleSave = async () => {
-    if (!pendingFile || !canSave) return;
+    if (!pendingFiles.length || !canSave) return;
     setUploading(true);
     try {
-      const item = await uploadPhoto(userId, pendingFile, effectiveCategory, userTags);
-      setItems(prev => [item, ...prev]);
-      setPendingFile(null);
+      for (const file of pendingFiles) {
+        const item = await uploadPhoto(userId, file, effectiveCategory, userTags);
+        setItems(prev => [item, ...prev]);
+      }
+      setPendingFiles([]);
       setTab('wardrobe');
     } catch (err) {
       alert(err.message || 'Upload failed');
@@ -118,69 +120,63 @@ export default function DashboardPage() {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-        <h1 className="title" style={{ marginBottom: 0 }}>{greeting()} {user?.name || 'User'} ☀️</h1>
-        {weather && (
-          <div className="card" style={{ padding: 12, marginBottom: 0 }}>
-            <div>{weather.temperature}°C</div>
-            <div style={{ fontSize: 12, color: '#8892b0' }}>{weather.condition}</div>
+      {tab !== 'home' && (
+        <h1 className="title" style={{ marginBottom: 24 }}>
+          {tab === 'wardrobe' && 'Wardrobe'}
+          {tab === 'declutter' && 'Declutter'}
+          {tab === 'profile' && 'Profile'}
+        </h1>
+      )}
+      {tab === 'home' && (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
+            <h1 className="title" style={{ marginBottom: 0 }}>{greeting()} {user?.name || 'User'} ☀️</h1>
+            {weather && (
+              <div className="card" style={{ padding: 12, marginBottom: 0 }}>
+                <div>{weather.temperature}°C</div>
+                <div style={{ fontSize: 12, color: '#8892b0' }}>{weather.condition}</div>
+              </div>
+            )}
           </div>
+          <Link to="/rush-mode" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', marginBottom: 24, background: '#e94560' }}>
+            <h2 style={{ fontSize: 20 }}>🔥 I'm Getting Late!</h2>
+            <p style={{ fontSize: 14, opacity: 0.9 }}>AI picks best outfit in 3 sec</p>
+          </Link>
+          <div style={{ marginBottom: 16 }}>
+            <p style={{ marginBottom: 8, color: '#8892b0' }}>What's the Occasion?</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {OCCASIONS.map(o => (
+                <span
+                  key={o.key}
+                  className={`chip ${selectedOccasion === o.key ? 'active' : ''}`}
+                  onClick={() => setSelectedOccasion(o.key)}
+                >
+                  {o.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="card" style={{ minHeight: 200, marginBottom: 80 }}>
+        {tab === 'home' && (
+          <>
+            <h2 style={{ fontSize: 20, marginBottom: 12 }}>Quick actions</h2>
+            <Link to="/wardrobe" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24, marginBottom: 0 }}>
+              <p style={{ fontSize: 40, marginBottom: 8 }}>👗</p>
+              <h3>Digital wardrobe</h3>
+              <p style={{ color: '#8892b0', marginTop: 4, fontSize: 14 }}>{items.length} items • Add & view clothes</p>
+            </Link>
+          </>
         )}
-      </div>
 
-      <Link to="/rush-mode" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', marginBottom: 24, background: '#e94560' }}>
-        <h2 style={{ fontSize: 20 }}>🔥 I'm Getting Late!</h2>
-        <p style={{ fontSize: 14, opacity: 0.9 }}>AI picks best outfit in 3 sec</p>
-      </Link>
-
-      <div style={{ marginBottom: 16 }}>
-        <p style={{ marginBottom: 8, color: '#8892b0' }}>What's the Occasion?</p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {OCCASIONS.map(o => (
-            <span
-              key={o.key}
-              className={`chip ${selectedOccasion === o.key ? 'active' : ''}`}
-              onClick={() => setSelectedOccasion(o.key)}
-            >
-              {o.label}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="nav" style={{ marginBottom: 24 }}>
-        {TABS.map(t => (
-          <button
-            key={t.key}
-            type="button"
-            className={`nav-tab ${tab === t.key ? 'active' : ''}`}
-            onClick={() => setTab(t.key)}
-            style={{
-              padding: '10px 16px',
-              background: tab === t.key ? '#e94560' : '#16213e',
-              border: 'none',
-              borderRadius: 8,
-              color: '#fff',
-              cursor: 'pointer',
-              fontSize: 14,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-            }}
-          >
-            <span>{t.icon}</span>
-            <span>{t.label}</span>
-          </button>
-        ))}
-      </div>
-
-      <div className="card" style={{ minHeight: 200 }}>
         {tab === 'wardrobe' && (
           <>
             <h2 style={{ fontSize: 20, marginBottom: 12 }}>Your wardrobe</h2>
             <p style={{ color: '#8892b0', marginBottom: 16 }}>{items.length} items</p>
             {items.length === 0 ? (
-              <p style={{ color: '#8892b0' }}>No clothes yet. Use <strong>+ Add clothes</strong> to add photos.</p>
+              <p style={{ color: '#8892b0', marginBottom: 16 }}>No clothes yet. Select photos from your device below.</p>
             ) : (
               <div
                 ref={scrollRef}
@@ -225,23 +221,17 @@ export default function DashboardPage() {
                 ))}
               </div>
             )}
-          </>
-        )}
-
-        {tab === 'add' && (
-          <>
-            <h2 style={{ fontSize: 20, marginBottom: 12 }}>Add clothes</h2>
             <div
               className="upload-zone"
               onDrop={handleDrop}
               onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); }}
               onDragLeave={(e) => e.currentTarget.classList.remove('dragover')}
             >
-              <input ref={fileRef} type="file" accept="image/*" onChange={(e) => handleFileSelect(e)} style={{ display: 'none' }} />
+              <input ref={fileRef} type="file" accept="image/*" multiple onChange={(e) => handleFileSelect(e)} style={{ display: 'none' }} />
               <p style={{ fontSize: 32, marginBottom: 8 }}>📷</p>
-              <p style={{ color: '#8892b0', marginBottom: 8 }}>Upload from device storage</p>
+              <p style={{ color: '#8892b0', marginBottom: 8 }}>Select photos from device</p>
               <button type="button" className="btn btn-secondary" onClick={() => fileRef.current?.click()} style={{ maxWidth: 240 }}>
-                Choose photos
+                Choose photos from device
               </button>
             </div>
             <div style={{ marginTop: 16 }}>
@@ -258,7 +248,7 @@ export default function DashboardPage() {
                 <input className="input" placeholder="Name your category" value={customCategory} onChange={(e) => setCustomCategory(e.target.value)} style={{ marginBottom: 12 }} />
               )}
               <input className="input" placeholder="Tags (e.g. office, casual)" value={tags} onChange={(e) => setTags(e.target.value)} style={{ marginBottom: 12 }} />
-              {pendingFile && <p style={{ fontSize: 14, color: '#8892b0', marginBottom: 8 }}>Selected: {pendingFile.name}</p>}
+              {pendingFiles.length > 0 && <p style={{ fontSize: 14, color: '#8892b0', marginBottom: 8 }}>Selected: {pendingFiles.length} photo(s)</p>}
               <button className="btn" onClick={handleSave} disabled={!canSave || uploading}>
                 {uploading ? 'Saving...' : 'Save to wardrobe'}
               </button>
@@ -345,6 +335,20 @@ export default function DashboardPage() {
           </>
         )}
       </div>
+
+      <footer className="app-footer">
+        {FOOTER_TABS.map(t => (
+          <button
+            key={t.key}
+            type="button"
+            className={`footer-tab ${tab === t.key ? 'active' : ''}`}
+            onClick={() => setTab(t.key)}
+          >
+            <span className="footer-icon">{t.icon}</span>
+            <span className="footer-label">{t.label}</span>
+          </button>
+        ))}
+      </footer>
     </div>
   );
 }
