@@ -58,27 +58,24 @@ export default function DashboardScreen({ navigation }) {
         ))}
       </ScrollView>
 
-      <View style={styles.swipeSection}>
-        <Text style={styles.sectionTitle}>Outfit Suggestions</Text>
-        <Pressable style={styles.swipeCard} onPress={() => navigation.navigate('OutfitSwipe')}>
-          <Text style={styles.swipeEmoji}>👔</Text>
-          <Text style={styles.swipeTitle}>Get outfit suggestions</Text>
-          <Text style={styles.swipeSub}>Swipe to like or skip</Text>
-        </Pressable>
-      </View>
+      <Pressable style={styles.digitalWardrobeCard} onPress={() => navigation.getParent()?.navigate('Wardrobe')}>
+        <Text style={styles.digitalEmoji}>👗</Text>
+        <Text style={styles.digitalTitle}>Digital wardrobe</Text>
+        <Text style={styles.digitalSub}>Add photos of dresses & tag them</Text>
+      </Pressable>
 
       <View style={styles.quickActions}>
         <Pressable style={styles.quickBtn} onPress={() => navigation.navigate('Wardrobe')}>
-          <Text style={styles.quickEmoji}>➕</Text>
-          <Text style={styles.quickLabel}>Add Clothes</Text>
+          <Text style={styles.quickEmoji}>👗</Text>
+          <Text style={styles.quickLabel}>Digital Wardrobe</Text>
         </Pressable>
         <Pressable style={styles.quickBtn} onPress={() => navigation.navigate('Donate')}>
           <Text style={styles.quickEmoji}>♻️</Text>
           <Text style={styles.quickLabel}>Declutter</Text>
         </Pressable>
-        <Pressable style={styles.quickBtn}>
-          <Text style={styles.quickEmoji}>❤️</Text>
-          <Text style={styles.quickLabel}>Favorites</Text>
+        <Pressable style={styles.quickBtn} onPress={() => navigation.navigate('Profile')}>
+          <Text style={styles.quickEmoji}>👤</Text>
+          <Text style={styles.quickLabel}>Profile</Text>
         </Pressable>
       </View>
     </ScrollView>
@@ -102,11 +99,10 @@ const styles = StyleSheet.create({
   occasionChipActive: { backgroundColor: '#e94560' },
   occasionText: { color: '#8892b0', fontSize: 14 },
   occasionTextActive: { color: '#fff' },
-  swipeSection: { marginBottom: 24 },
-  swipeCard: { backgroundColor: '#1a1a2e', borderRadius: 16, padding: 32, alignItems: 'center', borderWidth: 2, borderColor: '#16213e' },
-  swipeEmoji: { fontSize: 48, marginBottom: 8 },
-  swipeTitle: { fontSize: 18, fontWeight: '600', color: '#fff' },
-  swipeSub: { fontSize: 14, color: '#8892b0', marginTop: 4 },
+  digitalWardrobeCard: { backgroundColor: '#1a1a2e', borderRadius: 16, padding: 24, alignItems: 'center', marginBottom: 24 },
+  digitalEmoji: { fontSize: 40, marginBottom: 8 },
+  digitalTitle: { fontSize: 18, fontWeight: '600', color: '#fff' },
+  digitalSub: { fontSize: 14, color: '#8892b0', marginTop: 4 },
   quickActions: { flexDirection: 'row', gap: 12 },
   quickBtn: { flex: 1, backgroundColor: '#1a1a2e', borderRadius: 12, padding: 16, alignItems: 'center' },
   quickEmoji: { fontSize: 24, marginBottom: 4 },

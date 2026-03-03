@@ -65,36 +65,19 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ display: 'grid', gap: 12, marginBottom: 24 }}>
-        <Link
-          to={wardrobeCount > 0 ? '/outfit-swipe' : '/wardrobe'}
-          className="card"
-          style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24 }}
-        >
+        <Link to="/wardrobe" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24 }}>
           <p style={{ fontSize: 40, marginBottom: 8 }}>👗</p>
-          <h3>Choose from wardrobe</h3>
+          <h3>Digital wardrobe</h3>
           <p style={{ color: '#8892b0', marginTop: 4, fontSize: 14 }}>
             {wardrobeCount > 0
-              ? `AI suggests from your ${wardrobeCount} items (tags & occasion)`
-              : 'Add clothes first – your wardrobe is empty'}
+              ? `Add clothes & view ${wardrobeCount} items in carousel`
+              : 'Add clothes – carousel view once uploaded'}
           </p>
-        </Link>
-        <Link to="/wardrobe-view" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24 }}>
-          <p style={{ fontSize: 40, marginBottom: 8 }}>🖼️</p>
-          <h3>Show wardrobe</h3>
-          <p style={{ color: '#8892b0', marginTop: 4, fontSize: 14 }}>
-            View your dress photos in carousel mode
-          </p>
-        </Link>
-        <Link to="/wardrobe" className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', textAlign: 'center', padding: 24 }}>
-          <p style={{ fontSize: 40, marginBottom: 8 }}>➕</p>
-          <h3>Add clothes</h3>
-          <p style={{ color: '#8892b0', marginTop: 4, fontSize: 14 }}>Upload photos – AI classifies by tag/LLM</p>
         </Link>
       </div>
 
       <div className="nav" style={{ marginTop: 0 }}>
-        <Link to="/wardrobe">➕ Add Clothes</Link>
-        <Link to="/wardrobe-view">🖼️ Show Wardrobe</Link>
+        <Link to="/wardrobe">👗 Digital Wardrobe</Link>
         <Link to="/donate">♻️ Declutter</Link>
         <Link to="/profile">👤 Profile</Link>
       </div>

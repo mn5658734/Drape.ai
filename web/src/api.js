@@ -19,6 +19,8 @@ const MOCKS = {
     { id: 'ngo-1', name: 'Goonj', city: 'Mumbai' },
     { id: 'ngo-2', name: 'Uday Foundation', city: 'Delhi' },
   ]},
+  '/auth/send-otp': { success: true, message: 'OTP sent', expiresIn: 300 },
+  '/auth/verify-otp': { success: true, token: 'mock-jwt-user-1', user: { id: 'user-1', phone: '+919876543210', name: 'User', isProfileComplete: false }},
   '/shopping/recommendations': { products: [
     { id: '1', name: 'Blue Formal Shirt', brand: 'Peter England', price: '₹999', originalPrice: '₹1,499', platform: 'Myntra', url: 'https://www.myntra.com', image: 'https://picsum.photos/seed/shirt1/200/250', rating: 4.5 },
     { id: '2', name: 'Navy Slim Fit Trousers', brand: 'Louis Philippe', price: '₹1,299', originalPrice: '₹1,999', platform: 'Flipkart', url: 'https://www.flipkart.com', image: 'https://picsum.photos/seed/pants1/200/250', rating: 4.3 },

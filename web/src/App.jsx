@@ -3,7 +3,6 @@ import { AppProvider, useApp } from './context/AppContext';
 import LoginPage from './pages/LoginPage';
 import ProfileSetupPage from './pages/ProfileSetupPage';
 import WardrobePage from './pages/WardrobePage';
-import WardrobeCarouselPage from './pages/WardrobeCarouselPage';
 import DashboardPage from './pages/DashboardPage';
 import OutfitSwipePage from './pages/OutfitSwipePage';
 import RushModePage from './pages/RushModePage';
@@ -30,7 +29,6 @@ function AppRoutes() {
       <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
       <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetupPage /></ProtectedRoute>} />
       <Route path="/wardrobe" element={<ProtectedRoute><WardrobePage /></ProtectedRoute>} />
-      <Route path="/wardrobe-view" element={<ProtectedRoute><WardrobeCarouselPage /></ProtectedRoute>} />
       <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/outfit-swipe" element={<ProtectedRoute><OutfitSwipePage /></ProtectedRoute>} />
       <Route path="/rush-mode" element={<ProtectedRoute><RushModePage /></ProtectedRoute>} />
