@@ -35,7 +35,7 @@ function AppRoutes() {
       <Route path="/donate" element={<ProtectedRoute><DonatePage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/shopping" element={<ProtectedRoute><ShoppingRecommendationsPage /></ProtectedRoute>} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

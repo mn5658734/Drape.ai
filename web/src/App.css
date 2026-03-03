@@ -60,3 +60,17 @@
 .footer-tab.active { color: #e94560; }
 .footer-icon { font-size: 20px; }
 .footer-label { font-size: 10px; }
+
+.login-logo {
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto 24px;
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.login-logo video {
+  width: 100%;
+  height: auto;
+  display: block;
+}

@@ -63,6 +63,12 @@ export default function LoginPage() {
 
   return (
     <div className="container">
+      <div className="login-logo">
+        <video autoPlay loop muted playsInline>
+          <source src="/logo.mp4" type="video/mp4" />
+        </video>
+      </div>
+
       <h1 className="title">Welcome to DRIP</h1>
       <p className="subtitle">Sign in with your phone number</p>
 
@@ -77,9 +83,15 @@ export default function LoginPage() {
           <input
             className="input"
             type="tel"
-            placeholder="+91 98765 43210"
+            placeholder="Phone: +91 98765 43210"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+          />
+          <input
+            className="input"
+            placeholder="Your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
           <button className="btn" onClick={handleSendOtp} disabled={loading}>
             {loading ? 'Sending...' : 'Send OTP'}
@@ -87,7 +99,20 @@ export default function LoginPage() {
         </>
       ) : (
         <>
-          <input className="input" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} />
+          <input
+            className="input"
+            type="tel"
+            placeholder="Phone: +91 98765 43210"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            disabled
+          />
+          <input
+            className="input"
+            placeholder="Your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
           <input
             className="input"
             placeholder="Enter 4-digit OTP"
