@@ -163,10 +163,10 @@ export default function DashboardPage() {
     navigate('/login');
   };
 
-  const TOP_CATEGORIES = ['t-shirt', 'shirt', 'dress', 'blouse', 'top', 'jacket', 'sweater'];
+  const TOP_CATEGORIES = ['t-shirt', 'shirt', 'dress', 'blouse', 'top', 'jacket', 'sweater', 'blazer', 'suit'];
   const BOTTOM_CATEGORIES = ['pants', 'jeans', 'skirt', 'shorts', 'trousers'];
   const SHOE_CATEGORIES = ['shoes', 'shoe', 'heel', 'flat', 'sneakers', 'sandals'];
-  const ACCESSORY_CATEGORIES = ['bag', 'watch', 'belt', 'scarf', 'hat', 'accessory'];
+  const ACCESSORY_CATEGORIES = ['bag', 'watch', 'belt', 'scarf', 'hat', 'accessory', 'sunglasses', 'perfume'];
 
   const categorizeItems = (list) => {
     const tops = [], bottoms = [], shoes = [], accessories = [];
@@ -466,6 +466,20 @@ export default function DashboardPage() {
                 <option value="pants">Pants</option>
                 <option value="jeans">Jeans</option>
                 <option value="dress">Dress</option>
+                <option value="blazer">Blazer</option>
+                <option value="suit">Suit</option>
+                <option value="jacket">Jacket</option>
+                <option value="sweater">Sweater</option>
+                <option value="skirt">Skirt</option>
+                <option value="shorts">Shorts</option>
+                <option value="shoes">Shoes</option>
+                <option value="scarf">Scarf</option>
+                <option value="watch">Watch</option>
+                <option value="perfume">Perfume</option>
+                <option value="belt">Belt</option>
+                <option value="bag">Bag</option>
+                <option value="hat">Hat</option>
+                <option value="sunglasses">Sunglasses</option>
                 <option value="other">Other (custom)</option>
               </select>
               {category === 'other' && (
