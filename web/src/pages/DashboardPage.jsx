@@ -112,9 +112,10 @@ export default function DashboardPage() {
 
   const greeting = () => {
     const h = new Date().getHours();
-    if (h < 12) return 'Good Morning';
-    if (h < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (h >= 5 && h < 12) return 'Good Morning';
+    if (h >= 12 && h < 17) return 'Good Afternoon';
+    if (h >= 17 && h < 21) return 'Good Evening';
+    return 'Good Night';
   };
 
   const handleFileSelect = (e) => {
